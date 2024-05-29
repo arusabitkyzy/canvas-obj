@@ -93,7 +93,6 @@ let mouseDown = (event) => {
       is_moving = true;
       return;
     } else if (object instanceof CustomObject && object.isClicked(x, y)) {
-      console.log(i);
       grabbedObject = object;
       is_moving = true;
       return;
@@ -109,6 +108,9 @@ let mouseMove = (event) => {
     const newY = event.clientY - rect.top;
     // console.log(newX, newY);
     collisionDetection(newX, newY);
+    // console.log('moving');
+    // grabbedObject.move(newX, newY);
+    // drawUpdatedShapes();
     // objects[grabbedObject].x = newX;
     // objects[grabbedObject].y = newY;
     // drawUpdatedShapes();

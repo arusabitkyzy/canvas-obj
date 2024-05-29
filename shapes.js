@@ -45,6 +45,7 @@ export class Rectangle {
     }
     return false;
   }
+  move(x, y) {}
 }
 
 export class CustomObject {
@@ -89,6 +90,9 @@ export class CustomObject {
     context.fill();
   }
   drawMultiSide(context, side) {
+    if (this.vertices.length > 0) {
+      this.vertices = [];
+    }
     context.beginPath();
     let a = (2 * Math.PI) / side;
     for (let i = 0; i < side; i++) {
@@ -99,12 +103,6 @@ export class CustomObject {
     }
     context.closePath();
     context.fill();
-  }
-  move(newX, newY) {
-    this.vertices.forEach((vertex) => {
-      vertex.x += newX;
-      vertex.y += newY;
-    });
   }
   isClicked(x, y) {
     let cnt = 0;
