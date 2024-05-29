@@ -6,7 +6,20 @@ export class Square {
     this.height = width;
   }
   draw(context) {
+    context.fillStyle = 'gray';
     context.fillRect(this.x, this.y, this.width, this.height);
+  }
+  move(x, y) {}
+  isClicked(x, y) {
+    if (
+      this.x < x &&
+      this.x + this.width > x &&
+      this.y < y &&
+      this.y + this.height > y
+    ) {
+      return true;
+    }
+    return false;
   }
 }
 
@@ -18,7 +31,19 @@ export class Rectangle {
     this.height = height;
   }
   draw(context) {
+    context.fillStyle = 'gray';
     context.fillRect(this.x, this.y, this.width, this.height);
+  }
+  isClicked(x, y) {
+    if (
+      this.x < x &&
+      this.x + this.width > x &&
+      this.y < y &&
+      this.y + this.height > y
+    ) {
+      return true;
+    }
+    return false;
   }
 }
 
@@ -26,123 +51,75 @@ export class CustomObject {
   constructor(side) {
     this.side = side;
     this.size = 25;
+    this.x = 25;
+    this.y = 25;
+    this.vertices = [];
   }
   draw(context) {
     switch (this.side) {
       case 3:
         this.drawTriangle(context);
         break;
-      case 4:
-        this.drawSquare(context);
-        break;
       case 5:
-        this.drawPentagon(context);
+        this.drawMultiSide(context, 5);
         break;
       case 6:
-        this.drawHexagon(context);
+        this.drawMultiSide(context, 6);
         break;
       case 7:
-        this.drawHeptagon(context);
+        this.drawMultiSide(context, 7);
         break;
       case 8:
-        this.drawOctagon(context);
+        this.drawMultiSide(context, 8);
         break;
       case 9:
-        this.drawNonagon(context);
+        this.drawMultiSide(context, 9);
         break;
       case 10:
-        this.drawDecagon(context);
+        this.drawMultiSide(context, 10);
     }
   }
   drawTriangle(context) {
     context.beginPath();
-    context.moveTo(40, 10);
-    context.lineTo(10, 40);
-    context.lineTo(80, 40);
-    context.lineTo(40, 10);
+    context.moveTo(this.x + 25, 10);
+    context.lineTo(this.x + 10, 40);
+    context.lineTo(this.x + 50, 40);
+    context.lineTo(this.x + 25, 10);
     context.closePath();
     context.fill();
   }
-  drawSquare(context) {
-    let rectangle = new Rectangle(0, 0, 50, 100);
-    rectangle.draw(context);
-  }
-  drawPentagon(context) {
+  drawMultiSide(context, side) {
     context.beginPath();
-    let xCenter = 25;
-    let yCenter = 25;
-    let step = (2 * Math.PI) / 5;
-    let shift = (Math.PI / 180.0) * -18;
-    for (let i = 0; i <= 5; i++) {
-      let curStep = i * step + shift;
-      context.lineTo(
-        xCenter + this.size * Math.cos(curStep),
-        yCenter + this.size * Math.sin(curStep)
-      );
+    let a = (2 * Math.PI) / side;
+    for (let i = 0; i < side; i++) {
+      let verticeX = this.x + this.size * Math.cos(a * i);
+      let verticeY = this.y + this.size * Math.sin(a * i);
+      context.lineTo(verticeX, verticeY);
+      this.vertices.push({ x: verticeX, y: verticeY });
     }
     context.closePath();
     context.fill();
   }
-  drawHexagon(context) {
-    context.beginPath();
-    let a = (2 * Math.PI) / 6;
-    let x = 25;
-    let y = 25;
-    for (let i = 0; i < 6; i++) {
-      context.lineTo(
-        x + this.size * Math.cos(a * i),
-        y + this.size * Math.sin(a * i)
-      );
-    }
-    context.closePath();
-    context.fill();
+  move(newX, newY) {
+    this.vertices.forEach((vertex) => {
+      vertex.x += newX;
+      vertex.y += newY;
+    });
   }
-  drawHeptagon(context) {
-    context.beginPath();
-    let a = (2 * Math.PI) / 7;
-    for (let i = 0; i < 7; i++) {
-      context.lineTo(
-        25 + this.size * Math.cos(a * i),
-        25 + this.size * Math.sin(a * i)
-      );
+  isClicked(x, y) {
+    let cnt = 0;
+    for (let i = 0; i < this.vertices.length; i++) {
+      let j = (i + 1) % this.vertices.length;
+      console.log(this.vertices[i], ';', this.vertices[j]);
+      const xi = this.vertices[i].x,
+        yi = this.vertices[i].y;
+      const xj = this.vertices[j].x,
+        yj = this.vertices[j].y;
+      if (yi > y != yj > y && x < (xj - xi) * ((y - yi) / (yj - yi)) + xi) {
+        cnt++;
+      }
     }
-    context.closePath();
-    context.fill();
-  }
-  drawOctagon(context) {
-    context.beginPath();
-    let a = (2 * Math.PI) / 8;
-    for (let i = 0; i < 8; i++) {
-      context.lineTo(
-        25 + this.size * Math.cos(a * i),
-        25 + this.size * Math.sin(a * i)
-      );
-    }
-    context.closePath();
-    context.fill();
-  }
-  drawNonagon(context) {
-    context.beginPath();
-    let a = (2 * Math.PI) / 9;
-    for (let i = 0; i < 9; i++) {
-      context.lineTo(
-        25 + this.size * Math.cos(a * i),
-        25 + this.size * Math.sin(a * i)
-      );
-    }
-    context.closePath();
-    context.fill();
-  }
-  drawDecagon(context) {
-    context.beginPath();
-    let a = (2 * Math.PI) / 10;
-    for (let i = 0; i < 10; i++) {
-      context.lineTo(
-        25 + this.size * Math.cos(a * i),
-        25 + this.size * Math.sin(a * i)
-      );
-    }
-    context.closePath();
-    context.fill();
+    console.log(cnt);
+    return cnt % 2 === 1;
   }
 }

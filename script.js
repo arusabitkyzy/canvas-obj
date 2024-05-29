@@ -1,4 +1,5 @@
 import { Square, Rectangle, CustomObject } from './shapes.js';
+
 let canvas = document.getElementById('canvas');
 let context = canvas.getContext('2d');
 let buttons = document.querySelector('.buttons');
@@ -8,10 +9,10 @@ let custom = document.querySelector('.sides');
 square.addEventListener('click', createSquare);
 rect.addEventListener('click', createRectangle);
 custom.addEventListener('change', createCustomObject);
-let computedStyle = getComputedStyle(buttons, null);
 let objects = [];
 let is_moving = false;
 let grabbedObject = null;
+
 canvas.style.background = 'rgb(186, 186, 165)';
 canvas.width = 950;
 canvas.height = 300;
@@ -28,6 +29,7 @@ function isOverlap(object1, object2, newX, newY) {
   }
   return false;
 }
+
 function stickObjects(object1, object2) {
   let distanceToRight = object2.x - (object1.x + object1.width);
   let distanceToBottom = object2.y - (object1.y + object1.height);
@@ -47,73 +49,72 @@ function stickObjects(object1, object2) {
 
 function stickingDetection() {
   if (grabbedObject === null) return;
-  for (let i = 0; i < objects.length; i++) {
-    if (grabbedObject == i) continue;
-    stickObjects(objects[grabbedObject], objects[i]);
+  for (let object of objects) {
+    if (grabbedObject === object) continue;
+    stickObjects(grabbedObject, object);
     drawUpdatedShapes();
   }
 }
+
 function collisionDetection(newX, newY) {
-  for (let i = 0; i < objects.length; i++) {
-    if (grabbedObject == i) continue;
-    if (isOverlap(objects[grabbedObject], objects[i], newX, newY)) {
+  if (grabbedObject === null) return;
+  for (let object of objects) {
+    if (grabbedObject === object) continue;
+    if (isOverlap(grabbedObject, object, newX, newY)) {
       return;
     }
   }
-  objects[grabbedObject].x = newX;
-  objects[grabbedObject].y = newY;
+  grabbedObject.x = newX;
+  grabbedObject.y = newY;
   drawUpdatedShapes();
   stickingDetection();
 }
+
 function drawUpdatedShapes() {
   context.clearRect(0, 0, canvas.width, canvas.height);
   for (let object of objects) {
+    console.log('Drawing Object:', object);
     object.draw(context);
   }
-}
-function isClickedOnObject(x, y, object) {
-  if (
-    object.x < x &&
-    object.x + object.width > x &&
-    object.y < y &&
-    object.y + object.height > y
-  ) {
-    return true;
-  }
-  return false;
-}
-
-function formatSidebarWidth() {
-  let sidebarWidth = computedStyle.width;
-  let sidebarWidthFormatted = Math.round(
-    Number(sidebarWidth.substring(0, sidebarWidth.length - 2))
-  );
-  return sidebarWidthFormatted;
 }
 
 let mouseDown = (event) => {
   event.preventDefault();
-  let x = event.clientX - formatSidebarWidth();
-  let y = event.clientY;
-  for (let i = 0; i < objects.length; i++) {
-    if (isClickedOnObject(x, y, objects[i])) {
-      grabbedObject = i;
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  // console.log(x, y);
+  for (let object of objects) {
+    if (
+      (object instanceof Square || object instanceof Rectangle) &&
+      object.isClicked(x, y)
+    ) {
+      grabbedObject = object;
       is_moving = true;
       return;
-    } else {
-      grabbedObject = null;
-      is_moving = false;
+    } else if (object instanceof CustomObject && object.isClicked(x, y)) {
+      console.log(i);
+      grabbedObject = object;
+      is_moving = true;
+      return;
     }
   }
 };
+
 let mouseMove = (event) => {
   if (is_moving) {
     event.preventDefault();
-    let newX = event.clientX - formatSidebarWidth();
-    let newY = event.clientY - 50;
+    const rect = canvas.getBoundingClientRect();
+    const newX = event.clientX - rect.left;
+    const newY = event.clientY - rect.top;
+    // console.log(newX, newY);
     collisionDetection(newX, newY);
+    // objects[grabbedObject].x = newX;
+    // objects[grabbedObject].y = newY;
+    // drawUpdatedShapes();
   }
 };
+
 let mouseUp = (event) => {
   if (!is_moving) {
     return;
@@ -121,6 +122,7 @@ let mouseUp = (event) => {
   event.preventDefault();
   is_moving = false;
 };
+
 canvas.onmousedown = mouseDown;
 canvas.onmousemove = mouseMove;
 canvas.onmouseup = mouseUp;
@@ -144,6 +146,7 @@ function createRectangle() {
   rectangle.draw(context);
   drawUpdatedShapes();
 }
+
 function createCustomObject() {
   let sides = document.querySelector('.sides').value;
   let customObj = new CustomObject(+sides);
@@ -151,6 +154,7 @@ function createCustomObject() {
     objects[i].x += 100;
   }
   objects.push(customObj);
+  console.log(customObj);
   customObj.draw(context);
   drawUpdatedShapes();
 }
