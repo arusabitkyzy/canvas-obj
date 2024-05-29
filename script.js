@@ -73,8 +73,7 @@ function collisionDetection(newX, newY) {
 function drawUpdatedShapes() {
   context.clearRect(0, 0, canvas.width, canvas.height);
   for (let object of objects) {
-    console.log('Drawing Object:', object);
-    object.draw(context);
+    object.draw(context, object.side);
   }
 }
 

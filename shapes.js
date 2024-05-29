@@ -57,28 +57,19 @@ export class CustomObject {
     this.vertices = [];
   }
   draw(context) {
-    switch (this.side) {
-      case 3:
-        this.drawTriangle(context);
-        break;
-      case 5:
-        this.drawMultiSide(context, 5);
-        break;
-      case 6:
-        this.drawMultiSide(context, 6);
-        break;
-      case 7:
-        this.drawMultiSide(context, 7);
-        break;
-      case 8:
-        this.drawMultiSide(context, 8);
-        break;
-      case 9:
-        this.drawMultiSide(context, 9);
-        break;
-      case 10:
-        this.drawMultiSide(context, 10);
+    if (this.vertices.length > 0) {
+      this.vertices = [];
     }
+    context.beginPath();
+    let a = (2 * Math.PI) / this.side;
+    for (let i = 0; i < this.side; i++) {
+      let verticeX = this.x + this.size * Math.cos(a * i);
+      let verticeY = this.y + this.size * Math.sin(a * i);
+      context.lineTo(verticeX, verticeY);
+      this.vertices.push({ x: verticeX, y: verticeY });
+    }
+    context.closePath();
+    context.fill();
   }
   drawTriangle(context) {
     context.beginPath();
@@ -89,26 +80,11 @@ export class CustomObject {
     context.closePath();
     context.fill();
   }
-  drawMultiSide(context, side) {
-    if (this.vertices.length > 0) {
-      this.vertices = [];
-    }
-    context.beginPath();
-    let a = (2 * Math.PI) / side;
-    for (let i = 0; i < side; i++) {
-      let verticeX = this.x + this.size * Math.cos(a * i);
-      let verticeY = this.y + this.size * Math.sin(a * i);
-      context.lineTo(verticeX, verticeY);
-      this.vertices.push({ x: verticeX, y: verticeY });
-    }
-    context.closePath();
-    context.fill();
-  }
   isClicked(x, y) {
     let cnt = 0;
     for (let i = 0; i < this.vertices.length; i++) {
       let j = (i + 1) % this.vertices.length;
-      console.log(this.vertices[i], ';', this.vertices[j]);
+      console.log(this.vertices[i], ':', this.vertices[j]);
       const xi = this.vertices[i].x,
         yi = this.vertices[i].y;
       const xj = this.vertices[j].x,
