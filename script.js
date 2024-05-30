@@ -2,7 +2,6 @@ import { Square, Rectangle, CustomObject } from './shapes.js';
 
 let canvas = document.getElementById('canvas');
 let context = canvas.getContext('2d');
-let buttons = document.querySelector('.buttons');
 let square = document.querySelector('.square');
 let rect = document.querySelector('.rect');
 let custom = document.querySelector('.sides');
@@ -14,21 +13,9 @@ let is_moving = false;
 let grabbedObject = null;
 
 canvas.style.background = 'rgb(186, 186, 165)';
-canvas.width = 950;
-canvas.height = 300;
+canvas.width = 500;
+canvas.height = 500;
 context.fillStyle = 'gray';
-
-function isOverlap(object1, object2, newX, newY) {
-  if (
-    newX + object1.width > object2.x &&
-    newX < object2.x + object2.width &&
-    newY + object1.height > object2.y &&
-    newY < object2.y + object2.height
-  ) {
-    return true;
-  }
-  return false;
-}
 
 function stickObjects(object1, object2) {
   let distanceToRight = object2.x - (object1.x + object1.width);
@@ -60,14 +47,13 @@ function collisionDetection(newX, newY) {
   if (grabbedObject === null) return;
   for (let object of objects) {
     if (grabbedObject === object) continue;
-    if (isOverlap(grabbedObject, object, newX, newY)) {
+    if (grabbedObject.isOverlap(object, newX, newY)) {
       return;
     }
   }
-  grabbedObject.x = newX;
-  grabbedObject.y = newY;
+  grabbedObject.moveBy(newX, newY);
   drawUpdatedShapes();
-  stickingDetection();
+  // stickingDetection();
 }
 
 function drawUpdatedShapes() {
@@ -82,16 +68,8 @@ let mouseDown = (event) => {
   const rect = canvas.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
-  // console.log(x, y);
   for (let object of objects) {
-    if (
-      (object instanceof Square || object instanceof Rectangle) &&
-      object.isClicked(x, y)
-    ) {
-      grabbedObject = object;
-      is_moving = true;
-      return;
-    } else if (object instanceof CustomObject && object.isClicked(x, y)) {
+    if (object.isClicked(x, y)) {
       grabbedObject = object;
       is_moving = true;
       return;
@@ -105,14 +83,7 @@ let mouseMove = (event) => {
     const rect = canvas.getBoundingClientRect();
     const newX = event.clientX - rect.left;
     const newY = event.clientY - rect.top;
-    // console.log(newX, newY);
     collisionDetection(newX, newY);
-    // console.log('moving');
-    // grabbedObject.move(newX, newY);
-    // drawUpdatedShapes();
-    // objects[grabbedObject].x = newX;
-    // objects[grabbedObject].y = newY;
-    // drawUpdatedShapes();
   }
 };
 
