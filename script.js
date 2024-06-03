@@ -17,28 +17,11 @@ canvas.width = 500;
 canvas.height = 500;
 context.fillStyle = 'gray';
 
-function stickObjects(object1, object2) {
-  let distanceToRight = object2.x - (object1.x + object1.width);
-  let distanceToBottom = object2.y - (object1.y + object1.height);
-  let distanceToTop = object1.y - (object2.y + object2.height);
-  let distanceToLeft = object1.x - (object2.x + object2.width);
-
-  if (Math.abs(distanceToRight) <= 10) {
-    object1.x += distanceToRight;
-  } else if (Math.abs(distanceToBottom) <= 10) {
-    object1.y += distanceToBottom;
-  } else if (Math.abs(distanceToLeft) <= 10) {
-    object1.x -= distanceToLeft;
-  } else if (Math.abs(distanceToTop) <= 10) {
-    object1.y -= distanceToTop;
-  }
-}
-
 function stickingDetection() {
-  if (grabbedObject === null) return;
+  if (grabbedObject === null || grabbedObject instanceof CustomObject) return;
   for (let object of objects) {
     if (grabbedObject === object) continue;
-    stickObjects(grabbedObject, object);
+    grabbedObject.stickObjects(object);
     drawUpdatedShapes();
   }
 }
@@ -51,10 +34,9 @@ function collisionDetection(newX, newY) {
       return;
     }
   }
-
   grabbedObject.moveBy(newX, newY);
   drawUpdatedShapes();
-  // stickingDetection();
+  stickingDetection();
 }
 
 function drawUpdatedShapes() {
@@ -101,7 +83,7 @@ canvas.onmousemove = mouseMove;
 canvas.onmouseup = mouseUp;
 
 function createSquare() {
-  let square = new Square(0, 0, 50);
+  const square = new Square(0, 0, 50, 50);
   for (let i = 0; i < objects.length; i++) {
     objects[i].x += 100;
   }
@@ -111,7 +93,7 @@ function createSquare() {
 }
 
 function createRectangle() {
-  let rectangle = new Rectangle(0, 0, 50, 100);
+  const rectangle = new Rectangle(0, 0, 50, 100);
   for (let i = 0; i < objects.length; i++) {
     objects[i].x += 100;
   }
@@ -121,8 +103,8 @@ function createRectangle() {
 }
 
 function createCustomObject() {
-  let sides = document.querySelector('.sides').value;
-  let customObj = new CustomObject(+sides);
+  const sides = document.querySelector('.sides').value;
+  const customObj = new CustomObject(+sides);
   for (let i = 0; i < objects.length; i++) {
     objects[i].x += 100;
   }
