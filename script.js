@@ -51,6 +51,7 @@ function collisionDetection(newX, newY) {
       return;
     }
   }
+
   grabbedObject.moveBy(newX, newY);
   drawUpdatedShapes();
   // stickingDetection();
@@ -126,7 +127,6 @@ function createCustomObject() {
     objects[i].x += 100;
   }
   objects.push(customObj);
-  console.log(customObj);
   customObj.draw(context);
   drawUpdatedShapes();
 }

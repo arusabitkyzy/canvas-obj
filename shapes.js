@@ -36,6 +36,7 @@ export class Square {
     this.y = y;
   }
 }
+
 export class Figure {
   constructor(x, y, width, height) {
     this.x = x;
@@ -175,7 +176,7 @@ export class CustomObject {
     }
     return cnt % 2 === 1;
   }
-  projectInAxis(x, y, newX, newY) {
+  projectInAxis(x, y) {
     let min = 10000000000;
     let max = -10000000000;
     for (let i = 0; i < this.vertices.length; i++) {
@@ -189,11 +190,18 @@ export class CustomObject {
         min = projection;
       }
     }
+    console.log(min, max);
     return { min, max };
   }
   moveBy(x, y) {
+    const dx = x - this.x;
+    const dy = y - this.y;
     this.x = x;
     this.y = y;
+    this.vertices = this.vertices.map((vertex) => ({
+      x: vertex.x + dx,
+      y: vertex.y + dy,
+    }));
   }
   intervalDistance(minA, maxA, minB, maxB) {
     if (minA < minB) {
@@ -222,19 +230,8 @@ export class CustomObject {
         x: -totalEdges[i].y / length,
         y: totalEdges[i].x / length,
       };
-      const { min: minA, max: maxA } = this.projectInAxis(
-        axis.x,
-        axis.y,
-        newX,
-        newY
-      );
-      const { min: minB, max: maxB } = object2.projectInAxis(
-        axis.x,
-        axis.y,
-        0,
-        0
-      );
-      console.log(minA, maxA, minB, maxB);
+      const { min: minA, max: maxA } = this.projectInAxis(axis.x, axis.y);
+      const { min: minB, max: maxB } = object2.projectInAxis(axis.x, axis.y);
       if (this.intervalDistance(minA, maxA, minB, maxB) > 0) {
         this.moveBy(originX, originY);
         return false;
